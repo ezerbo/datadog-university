@@ -7,6 +7,7 @@ import com.demo.enrollment.model.Student;
 import com.demo.enrollment.model.api.CreateOrUpdateStudentRequest;
 import com.demo.enrollment.model.api.GetStudentEnrollmentsResponse;
 import com.demo.enrollment.repository.StudentRepository;
+import datadog.trace.api.Trace;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class StudentService {
         this.repository = repository;
     }
 
+    @Trace(operationName = "student.create")
     public Student create(CreateOrUpdateStudentRequest request) {
         log.info("Creating a new student: {}", request);
         if (repository.existsBySsn(request.getSsn())) {
@@ -40,6 +42,7 @@ public class StudentService {
         return repository.save(student);
     }
 
+    @Trace(operationName = "student.update")
     public Student update(Long id, CreateOrUpdateStudentRequest request) {
         log.info("Updating a student, request: {}, id: {}", request, id);
         Optional<Student> studentOp = repository.findById(id);
@@ -59,6 +62,7 @@ public class StudentService {
                 .emailAddress(request.getEmailAddress())
                 .ssn(request.getSsn())
                 .dob(request.getDob())
+                .enrollments(studentOp.get().getEnrollments())
                 .build();
         return repository.save(student);
     }
@@ -75,6 +79,7 @@ public class StudentService {
         repository.deleteById(id);
     }
 
+    @Trace(operationName = "student.getEnrollments")
     public GetStudentEnrollmentsResponse getEnrollments(Long id) {
         log.info("Getting enrollments for student with id: {}", id);
         return repository.findById(id)

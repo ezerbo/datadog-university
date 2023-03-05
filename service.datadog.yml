@@ -1,0 +1,43 @@
+---
+schema-version: v2
+team: University SREs
+dd-service: enrollments-service
+contacts:
+  - type: email
+    name: Edouard Zerbo
+    contact: zerboedouard@gmail.com
+docs:
+  - name: Readme File
+    provider: link
+    url: https://github.com/ezerbo/enrollments-service#readme
+repos:
+  - provider: github
+    name: Enrollments Service
+    url: https://github.com/ezerbo/enrollments-service
+links:
+  - name: Courses & Enrollments
+    type: dashboard
+    url: https://app.datadoghq.com/dashboard/7q2-634-hpc/courses-enrollments
+  - name: Operations
+    type: runbook
+    url: https://app.datadoghq.com/notebook/4930856/courses-enrollments-operations
+
+---
+schema-version: v2
+team: University SREs
+dd-service: enrollments_db
+contacts:
+  - type: email
+    name: Edouard Zerbo
+    contact: zerboedouard@gmail.com
+docs:
+  - name: Readme File
+    provider: link
+    url: https://github.com/ezerbo/enrollments-service#readme
+links:
+  - name: Courses & Enrollments
+    type: dashboard
+    url: https://app.datadoghq.com/dashboard/7q2-634-hpc/courses-enrollments
+  - name: Operations
+    type: runbook
+    url: https://app.datadoghq.com/notebook/4930856/courses-enrollments-operations

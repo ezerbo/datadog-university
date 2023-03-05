@@ -1,18 +1,24 @@
 #!/bin/bash
 
 while getopts "b:" option; do
-  # shellcheck disable=SC2220
+
   case $option in
     b)
       BUILD_IMAGE="$OPTARG";;
-    :)
+    *)
       BUILD_IMAGE=false;;
   esac
 done
 
 if [ "$BUILD_IMAGE" = true ]; then
-  ./mvnw clean install -DskipTests
-  docker build -t ezerbo/enrollments-service .
+   if ./mvnw clean install -DskipTests; then
+     docker build . \
+      -t ezerbo/enrollments-service \
+      --label org.opencontainers.image.revision="$(git rev-parse HEAD)" \
+      --label org.opencontainers.image.source=github.com/ezerbo/enrollments-service
+   else
+     echo 'Maven build failed, please fix it and try again'
+   fi
 fi
 
 CONTAINER_STATUS=$(docker inspect -f '{{.State.Status}}' enrollments-service)
