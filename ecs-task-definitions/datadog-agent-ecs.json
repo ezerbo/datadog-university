@@ -4,8 +4,8 @@
     {
       "name": "datadog-agent",
       "image": "public.ecr.aws/datadog/agent:latest",
-      "cpu": 100,
-      "memory": 512,
+      "cpu": 10,
+      "memory": 256,
       "essential": true,
       "logConfiguration": {
         "logDriver": "awslogs",
@@ -34,18 +34,22 @@
           "readOnly": true
         },
         {
-          "containerPath": "/host/sys/fs/cgroup",
-          "sourceVolume": "cgroup",
-          "readOnly": true
-        },
-        {
           "containerPath": "/host/proc",
           "sourceVolume": "proc",
           "readOnly": true
         },
         {
+          "containerPath": "/host/sys/fs/cgroup",
+          "sourceVolume": "cgroup",
+          "readOnly": true
+        },
+        {
+          "containerPath": "/sys/kernel/debug",
+          "sourceVolume": "debug"
+        },
+        {
           "containerPath": "/opt/datadog-agent/run",
-          "sourceVolume": "pointdir",
+          "sourceVolume": "agent_run",
           "readOnly": false
         },
         {
@@ -84,8 +88,26 @@
         {
           "name": "DD_PROCESS_AGENT_ENABLED",
           "value": "true"
+        },
+        {
+          "name": "DD_SYSTEM_PROBE_NETWORK_ENABLED",
+          "value": "true"
         }
       ],
+      "linuxParameters": {
+        "capabilities": {
+          "add": [
+            "SYS_ADMIN",
+            "SYS_RESOURCE",
+            "SYS_PTRACE",
+            "NET_ADMIN",
+            "NET_BROADCAST",
+            "NET_RAW",
+            "IPC_LOCK",
+            "CHOWN"
+          ]
+        }
+      },
       "healthCheck": {
         "retries": 3,
         "command": ["CMD-SHELL","agent health"],
@@ -118,14 +140,23 @@
       "host": {
         "sourcePath": "/opt/datadog-agent/run"
       },
-      "name": "pointdir"
+      "name": "agent_run"
     },
     {
       "host": {
         "sourcePath": "/var/lib/docker/containers/"
       },
       "name": "containers_root"
+    },
+    {
+      "host": {
+        "sourcePath": "/sys/kernel/debug/"
+      },
+      "name": "debug"
     }
+  ],
+  "requiresCompatibilities": [
+    "EC2"
   ],
   "family": "datadog-agent-task"
 }
