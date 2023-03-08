@@ -17,5 +17,5 @@ public class GetStudentEnrollmentsResponse {
 
     private Student student;
 
-    private List<Course> courses;
+    private List<CourseEnrollmentDTO> enrollments;
 }

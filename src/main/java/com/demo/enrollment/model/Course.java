@@ -18,8 +18,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "course")
-@ToString(exclude = {"assignments"})
-@EqualsAndHashCode(exclude = {"assignments"})
+@ToString(exclude = {"enrollments"})
+@EqualsAndHashCode(exclude = {"enrollments"})
 public class Course {
 
     @Id

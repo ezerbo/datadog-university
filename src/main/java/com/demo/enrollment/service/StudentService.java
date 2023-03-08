@@ -4,6 +4,7 @@ import com.demo.enrollment.error.DuplicateRecordException;
 import com.demo.enrollment.error.NoDataFoundException;
 import com.demo.enrollment.model.Enrollment;
 import com.demo.enrollment.model.Student;
+import com.demo.enrollment.model.api.CourseEnrollmentDTO;
 import com.demo.enrollment.model.api.CreateOrUpdateStudentRequest;
 import com.demo.enrollment.model.api.GetStudentEnrollmentsResponse;
 import com.demo.enrollment.repository.StudentRepository;
@@ -68,14 +69,17 @@ public class StudentService {
     }
 
     public List<Student> getAll() {
+        log.info("Getting all students");
         return repository.findAll();
     }
 
     public Optional<Student> getOne(Long id) {
+        log.info("Getting student with id: '{}'", id);
         return repository.findById(id);
     }
 
     public void delete(Long id) {
+        log.info("Deleting student with id: '{}'", id);
         repository.deleteById(id);
     }
 
@@ -85,8 +89,18 @@ public class StudentService {
         return repository.findById(id)
                 .map(student -> GetStudentEnrollmentsResponse.builder()
                         .student(student)
-                        .courses(student.getEnrollments().stream().map(Enrollment::getCourse).collect(Collectors.toList()))
+                        .enrollments(toEnrollments(student.getEnrollments()))
                         .build())
                 .orElseThrow(() -> new NoDataFoundException("No student found with id %s", id));
+    }
+
+    private List<CourseEnrollmentDTO> toEnrollments(List<Enrollment> enrollments) {
+        return enrollments.stream()
+                .map(e -> CourseEnrollmentDTO.builder()
+                        .gradeId(e.getGradeId())
+                        .enrollmentDate(e.getEnrollmentDate())
+                        .course(e.getCourse())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

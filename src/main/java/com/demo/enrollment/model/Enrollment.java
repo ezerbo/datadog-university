@@ -18,19 +18,22 @@ public class Enrollment {
 	
 	@EmbeddedId
 	private EnrollmentId id;
-	
+
 	@Temporal(TemporalType.DATE)
 	@Column(name = "enrollment_date", nullable = false)
 	private Date enrollmentDate;
-	
+
+	@Column(name = "grade_id", nullable = false)
+	private Long gradeId;
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "student_id", nullable = false, insertable = false, updatable = false)
 	private Student student;
-	
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "course_id", nullable = false, insertable = false, updatable = false)
 	private Course course;
-	
+
 	@PrePersist
 	public void onSave() {
 		setEnrollmentDate(new Date());

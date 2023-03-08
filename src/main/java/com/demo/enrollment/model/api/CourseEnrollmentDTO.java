@@ -13,13 +13,11 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseEnrollmentResponse {
+public class CourseEnrollmentDTO {
 
-    private Student student;
-
-    private Course course;
+    private Date enrollmentDate;
 
     private Long gradeId;
 
-    private Date enrollmentDate;
+    private Course course;
 }

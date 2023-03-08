@@ -1,6 +1,5 @@
 package com.demo.enrollment.model.api;
 
-import com.demo.enrollment.model.Course;
 import com.demo.enrollment.model.Student;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,13 +12,11 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseEnrollmentResponse {
+public class StudentEnrollmentDTO {
 
-    private Student student;
-
-    private Course course;
+    private Date enrollmentDate;
 
     private Long gradeId;
 
-    private Date enrollmentDate;
+    private Student student;
 }

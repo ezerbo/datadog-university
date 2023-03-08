@@ -7,13 +7,11 @@ import com.demo.enrollment.model.Enrollment;
 import com.demo.enrollment.model.EnrollmentId;
 import com.demo.enrollment.model.Course;
 import com.demo.enrollment.model.Student;
-import com.demo.enrollment.model.api.CourseEnrollmentRequest;
-import com.demo.enrollment.model.api.CourseEnrollmentResponse;
-import com.demo.enrollment.model.api.CreateOrUpdateCourseRequest;
-import com.demo.enrollment.model.api.GetCourseEnrollmentsResponse;
+import com.demo.enrollment.model.api.*;
 import com.demo.enrollment.repository.EnrollmentRepository;
 import com.demo.enrollment.repository.CourseRepository;
 import com.demo.enrollment.repository.StudentRepository;
+import com.demo.enrollment.service.client.GradesApiClient;
 import datadog.trace.api.Trace;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,13 +28,16 @@ public class CourseService {
     private final CourseRepository repository;
     private final EnrollmentRepository enrollmentRepository;
     private final StudentRepository studentRepository;
+    private final GradesApiClient gradesApiClient;
 
     public CourseService(CourseRepository repository,
                          StudentRepository studentRepository,
-                         EnrollmentRepository enrollmentRepository) {
+                         EnrollmentRepository enrollmentRepository,
+                         GradesApiClient gradesApiClient) {
         this.repository = repository;
         this.enrollmentRepository = enrollmentRepository;
         this.studentRepository = studentRepository;
+        this.gradesApiClient = gradesApiClient;
     }
 
     @Trace(operationName = "course.create")
@@ -82,14 +83,17 @@ public class CourseService {
     }
 
     public List<Course> getAll() {
+        log.info("Getting all courses");
         return repository.findAll();
     }
 
     public Optional<Course> getOne(Long id) {
+        log.info("Getting course with id: '{}'", id);
         return repository.findById(id);
     }
 
     public void delete(Long id) {
+        log.info("Deleting course with id: '{}'", id);
         repository.deleteById(id);
     }
 
@@ -99,7 +103,7 @@ public class CourseService {
         return repository.findById(id)
                 .map(course -> GetCourseEnrollmentsResponse.builder()
                         .course(course)
-                        .students(course.getEnrollments().stream().map(Enrollment::getStudent).collect(Collectors.toList()))
+                        .enrollments(toEnrollments(course.getEnrollments()))
                         .build())
                 .orElseThrow(() -> new NoDataFoundException("No student found with id %s", id));
     }
@@ -111,20 +115,76 @@ public class CourseService {
                 .orElseThrow(() -> new NoDataFoundException("No student found with id: %s", request.getStudentId()));
         Course course = repository.findById(courseId)
                 .orElseThrow(() -> new NoDataFoundException("No course found with id: %s", courseId));
+        Grade grade = createGrade(student, course);
         Enrollment enrollment = Enrollment.builder()
-                .id(EnrollmentId.builder()
-                        .courseId(courseId)
-                        .studentId(request.getStudentId())
-                        .build())
+                .id(buildEnrollmentId(request.getStudentId(), courseId))
                 .enrollmentDate(new Date())
                 .course(course)
                 .student(student)
+                .gradeId(grade.getId())
                 .build();
+        log.info("Saving course enrollment: {}", enrollment);
         enrollmentRepository.save(enrollment);
         return CourseEnrollmentResponse.builder()
                 .enrollmentDate(enrollment.getEnrollmentDate())
                 .student(student)
+                .gradeId(grade.getId())
                 .course(course)
+                .build();
+    }
+
+    public GradeDTO getGrade(Long id, Long studentId) {
+        Enrollment enrollment = enrollmentRepository.findById(buildEnrollmentId(studentId, id))
+                .orElseThrow(() -> new NoDataFoundException("No enrollment found with studentId '%s' and courseId: '%s'",
+                        studentId, id));
+        Grade grade = gradesApiClient.get(enrollment);
+        log.info("Retrieved grade: {}", grade);
+        return GradeDTO.builder()
+                .grade(grade.getGrade())
+                .course(enrollment.getCourse())
+                .student(enrollment.getStudent())
+                .build();
+    }
+
+    public GradeDTO setGrade(Long id, SetGradeRequest request) {
+        Enrollment enrollment = enrollmentRepository.findById(buildEnrollmentId(request.getStudentId(), id))
+                .orElseThrow(() -> new NoDataFoundException("No enrollment found with studentId '%s' and courseId: '%s'",
+                        request.getStudentId(), id));
+        UpdateGradeRequest updateGradeRequest = UpdateGradeRequest.builder()
+                .courseId(id)
+                .studentId(request.getStudentId())
+                .grade(request.getGrade())
+                .build();
+        Grade grade = gradesApiClient.update(enrollment.getGradeId(), updateGradeRequest);
+        return GradeDTO.builder()
+                .grade(grade.getGrade())
+                .student(enrollment.getStudent())
+                .course(enrollment.getCourse())
+                .build();
+    }
+
+    private Grade createGrade(Student student, Course course) {
+        CreateGradeRequest request = CreateGradeRequest.builder()
+                .studentId(student.getId())
+                .courseId(course.getId())
+                .build();
+        return gradesApiClient.create(request);
+    }
+
+    private List<StudentEnrollmentDTO> toEnrollments(List<Enrollment> enrollments) {
+        return enrollments.stream()
+                .map(e -> StudentEnrollmentDTO.builder()
+                        .gradeId(e.getGradeId())
+                        .enrollmentDate(e.getEnrollmentDate())
+                        .student(e.getStudent())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private EnrollmentId buildEnrollmentId(Long studentId, Long courseId) {
+        return EnrollmentId.builder()
+                .studentId(studentId)
+                .courseId(courseId)
                 .build();
     }
 }

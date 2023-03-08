@@ -9,6 +9,4 @@ public class ServiceProperties {
     private InstrumentationConfig instrumentationConfig = new InstrumentationConfig();
 
     private ExternalServiceConfig gradesServiceConfig = new ExternalServiceConfig();
-
-    private ExternalServiceConfig registrarService = new ExternalServiceConfig();
 }

@@ -19,8 +19,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "student")
-@ToString(exclude = {"assignments"})
-@EqualsAndHashCode(exclude = {"assignments"})
+@ToString(exclude = {"enrollments"})
+@EqualsAndHashCode(exclude = {"enrollments"})
 public class Student {
 
     @Id

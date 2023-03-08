@@ -9,4 +9,5 @@ public class ServicePaths {
     public static final String STUDENTS = "/students";
     public static final String STUDENT_BY_ID = STUDENTS + "/{id}";
     public static final String STUDENT_ENROLLMENTS = STUDENTS + "/{id}/enrollments";
+    public static final String GRADES = COURSES + "/{id}/grades";
 }

@@ -7,19 +7,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseEnrollmentResponse {
+public class GradeDTO {
+
+    private String grade;
 
     private Student student;
 
     private Course course;
-
-    private Long gradeId;
-
-    private Date enrollmentDate;
 }

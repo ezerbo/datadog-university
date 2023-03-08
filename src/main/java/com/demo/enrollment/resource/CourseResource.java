@@ -4,12 +4,14 @@ import com.demo.enrollment.model.api.*;
 import com.demo.enrollment.service.CourseService;
 import com.demo.enrollment.model.Course;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RestController
 @Tag(name = "Courses", description = "Operations on Courses")
 public class CourseResource {
@@ -57,6 +59,18 @@ public class CourseResource {
     public ResponseEntity<CourseEnrollmentResponse> enroll(@PathVariable Long id,
                                                            @RequestBody CourseEnrollmentRequest request) {
         return ResponseEntity.ok(service.enroll(id, request));
+    }
+
+    @GetMapping(ServicePaths.GRADES)
+    public ResponseEntity<GradeDTO> getGrade(@PathVariable Long id, @RequestParam Long studentId) {
+        log.info("Getting student grades of student with id: '{}' and courseId: {}", studentId, id);
+        return ResponseEntity.ok(service.getGrade(id, studentId));
+    }
+
+    @PostMapping(ServicePaths.GRADES)
+    public ResponseEntity<GradeDTO> setGrade(@PathVariable Long id, @RequestBody @Valid SetGradeRequest request) {
+        log.info("Setting grade for course with id: {}, {}", id, request);
+        return ResponseEntity.ok(service.setGrade(id, request));
     }
 }
 
