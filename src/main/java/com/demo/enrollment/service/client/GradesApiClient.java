@@ -1,6 +1,5 @@
 package com.demo.enrollment.service.client;
 
-import com.demo.enrollment.config.ExternalServiceConfig;
 import com.demo.enrollment.config.ServiceProperties;
 import com.demo.enrollment.model.Enrollment;
 import com.demo.enrollment.model.api.CreateGradeRequest;
@@ -16,33 +15,32 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class GradesApiClient {
 
-    private final ExternalServiceConfig gradesServiceConfig;
+    private final String gradesApiUrl;
     private final RestTemplate client = new RestTemplate();
 
     public GradesApiClient(ServiceProperties properties) {
-        this.gradesServiceConfig = properties.getGradesServiceConfig();
+        this.gradesApiUrl = properties.getGradesServiceConfig()
+                .getUrl();
     }
 
     public Grade get(Enrollment enrollment) {
         log.info("Getting grade for enrollment '{}'", enrollment);
         // TODO Add service check
-        return client.getForEntity(String.format(gradesServiceConfig.getUrl().concat("/%s"),
-                        enrollment.getGradeId()), Grade.class)
+        return client.getForEntity(gradesApiUrl.concat("/{id}?tuitionId={tuitionId}"), Grade.class,
+                        enrollment.getGradeId(), enrollment.getStudent().getTuitionId())
                 .getBody();
     }
 
     public Grade create(CreateGradeRequest request) {
         log.info("Creating grade {}", request);
         HttpEntity<CreateGradeRequest> entity = new HttpEntity<>(request);
-        return client.exchange(gradesServiceConfig.getUrl(), HttpMethod.POST, entity, Grade.class)
-                .getBody();
+        return client.exchange(gradesApiUrl, HttpMethod.POST, entity, Grade.class).getBody();
     }
 
     public Grade update(Long gradeId, UpdateGradeRequest request) {
-        log.info("updating grade {}", request);
+        log.info("Updating grade {}", request);
         HttpEntity<UpdateGradeRequest> entity = new HttpEntity<>(request);
-        return client.exchange(String.format(gradesServiceConfig.getUrl().concat("/%s"), gradeId),
-                        HttpMethod.PUT, entity, Grade.class)
+        return client.exchange(gradesApiUrl.concat("/{id}"), HttpMethod.PUT, entity, Grade.class, gradeId)
                 .getBody();
     }
 

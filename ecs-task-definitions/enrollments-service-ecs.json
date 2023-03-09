@@ -1,4 +1,5 @@
 {
+  "executionRoleArn": "arn:aws:iam::637020351615:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "enrollments-service",
@@ -19,6 +20,16 @@
           "hostPort": 8080,
           "protocol": "tcp",
           "containerPort": 8080
+        }
+      ],
+      "secrets": [
+        {
+          "name": "GRADES_SERVICE_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:637020351615:parameter/GRADES_SERVICE_URL"
+        },
+        {
+          "name": "TUITION_SERVICE_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:637020351615:parameter/TUITION_SERVICE_URL"
         }
       ],
       "environment": [

@@ -1,10 +1,8 @@
 package com.demo.enrollment.resource;
 
+import com.demo.enrollment.model.api.*;
 import com.demo.enrollment.service.StudentService;
 import com.demo.enrollment.model.Student;
-import com.demo.enrollment.model.api.CreateOrUpdateStudentRequest;
-import com.demo.enrollment.model.api.GetStudentEnrollmentsResponse;
-import com.demo.enrollment.model.api.ServicePaths;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +21,13 @@ public class StudentResource {
     }
 
     @PostMapping(ServicePaths.STUDENTS)
-    public ResponseEntity<Student> create(@RequestBody @Valid CreateOrUpdateStudentRequest request) {
+    public ResponseEntity<Student> create(@RequestBody @Valid CreateStudentRequest request) {
         return ResponseEntity.ok(service.create(request));
     }
 
     @PutMapping(ServicePaths.STUDENT_BY_ID)
     public ResponseEntity<Student> update(@PathVariable Long id,
-                                          @RequestBody @Valid CreateOrUpdateStudentRequest request) {
+                                          @RequestBody @Valid UpdateStudentRequest request) {
         return ResponseEntity.ok(service.update(id, request));
     }
 
@@ -55,4 +53,17 @@ public class StudentResource {
     public ResponseEntity<GetStudentEnrollmentsResponse> getEnrollments(@PathVariable Long id) {
         return ResponseEntity.ok(service.getEnrollments(id));
     }
+
+    @GetMapping(ServicePaths.TUITION)
+    public ResponseEntity<Tuition> getTuitionDetails(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getTuitionDetails(id));
+    }
+
+    @PutMapping(ServicePaths.TUITION)
+    public ResponseEntity<Tuition> updateTuitionDetails(@PathVariable Long id,
+                                                        @RequestBody @Valid UpdateTuitionRequest request) {
+        return ResponseEntity.ok(service.updateTuitionDetails(id, request));
+    }
+
+
 }

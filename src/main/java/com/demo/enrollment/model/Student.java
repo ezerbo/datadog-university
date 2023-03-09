@@ -43,12 +43,15 @@ public class Student {
 
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "dob", nullable = false)
+    @Column(name = "dob")
     private Date dob;
 
     @NotBlank
     @Column(name = "ssn", nullable = false)
     private String ssn;
+
+    @Column(name = "tuition_id")
+    private Long tuitionId;
 
     @JsonIgnore
     @OneToMany(mappedBy = "student", orphanRemoval = true)

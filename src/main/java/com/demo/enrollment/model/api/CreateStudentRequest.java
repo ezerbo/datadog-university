@@ -13,7 +13,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateOrUpdateStudentRequest {
+public class CreateStudentRequest {
 
     @Length(min = 3, max = 50, message = "Firstname should be between {min} & {max} characters long")
     @NotBlank(message = "The firstname is required")
@@ -34,4 +34,10 @@ public class CreateOrUpdateStudentRequest {
     @Length(min = 9, max = 9, message = "Lastname should be between {max} characters long")
     @NotBlank(message = "The ssn is required")
     private String ssn;
+
+    @NotNull
+    @Positive(message = "Must be a positive value")
+    private Double tuitionAmount;
+
+    private boolean paid;
 }

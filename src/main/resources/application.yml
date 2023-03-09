@@ -26,3 +26,5 @@ app:
      agent-port: 8125
   grades-service-config:
     url: http://localhost:8081/grades
+  tuition-service-config:
+    url: http://localhost:8082/tuition

@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -17,17 +16,17 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class ErrorTranslator {
 
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ErrorVM> translate(Exception ex) {
+	public ErrorVM translate(Exception ex) {
 		log.error("error {}", ex.getMessage());
 		ex.printStackTrace();
-		ErrorVM errorVM = toErrorVM(ex);
-		return new ResponseEntity<>(errorVM, HttpStatus.INTERNAL_SERVER_ERROR);
+		return toErrorVM(ex);
 	}
 
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler({DuplicateRecordException.class, InvalidCourseDatesException.class})
-	public ErrorVM translateInvalidOrDuplicateDateExceptions(Exception ex) {
+	public ErrorVM translateInvalidDateExceptions(Exception ex) {
 		log.error("error {}", ex.getMessage());
 		ex.printStackTrace();
 		return toErrorVM(ex);
@@ -35,16 +34,15 @@ public class ErrorTranslator {
 
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ExceptionHandler(NoDataFoundException.class)
-	public ResponseEntity<ErrorVM> translateMissingDataException(NoDataFoundException ex) {
+	public ErrorVM translate(NoDataFoundException ex) {
 		log.error("error {}", ex.getMessage());
 		ex.printStackTrace();
-		ErrorVM errorVM = toErrorVM(ex);
-		return new ResponseEntity<>(errorVM, HttpStatus.INTERNAL_SERVER_ERROR);
+		return toErrorVM(ex);
 	}
 	
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ErrorVM translateRequestValidationException(MethodArgumentNotValidException ex) {
+	public ErrorVM translate(MethodArgumentNotValidException ex) {
 		if(log.isDebugEnabled()) ex.printStackTrace();
 		List<FieldErrorVM> errors = ex.getBindingResult().getFieldErrors().stream()
 				.map(error -> FieldErrorVM.builder()
