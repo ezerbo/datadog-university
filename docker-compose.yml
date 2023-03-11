@@ -1,0 +1,85 @@
+version: '3'
+services:
+  datadog:
+    image: 'datadog/agent:latest'
+    environment:
+      - DD_API_KEY
+      - DD_HOSTNAME=datadog-agent
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_PROCESS_AGENT_ENABLED=true
+      - DD_SYSTEM_PROBE_ENABLED=true
+      - DD_DOCKER_LABELS_AS_TAGS={}
+      - DD_TAGS='env:local'
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+    ports:
+      - 127.0.0.1:8126:8126/tcp
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /sys/kernel/debug/:/sys/kernel/debug
+    cap_add:
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - SYS_PTRACE
+      - NET_ADMIN
+      - NET_BROADCAST
+      - NET_RAW
+      - IPC_LOCK
+      - CHOWN
+    security_opt:
+      - apparmor:unconfined
+  enrollments:
+    environment:
+      - ENV=local
+      - PROFILE=local
+      - GRADES_SERVICE_URL=http://host.docker.internal:8081/grades
+      - TUITION_SERVICE_URL=http://host.docker.internal:8082/tuition
+      - DD_PROFILING_ENABLED=true
+      - DD_AGENT_HOST=datadog
+    image: 'docker.io/ezerbo/enrollments-service'
+    ports:
+      - '8080:8080'
+    depends_on:
+      - datadog
+    labels:
+      com.datadoghq.tags.env: 'local'
+      com.datadoghq.tags.service: 'enrollments-service'
+      com.datadoghq.tags.version: '1.0'
+      com.datadoghq.ad.logs: '[{"source": "java", "service": "enrollments-service"}]'
+  grades:
+    environment:
+      - ENV=local
+      - PROFILE=local
+      - ENROLLMENTS_SERVICE_URL=http://host.docker.internal:8080
+      - TUITION_SERVICE_URL=http://host.docker.internal:8082/tuition
+      - DD_PROFILING_ENABLED=true
+      - DD_AGENT_HOST=datadog
+    image: 'docker.io/ezerbo/grades-service'
+    ports:
+      - '8081:8081'
+    depends_on:
+      - datadog
+    labels:
+      com.datadoghq.tags.env: 'local'
+      com.datadoghq.tags.service: 'grades-service'
+      com.datadoghq.tags.version: '1.0'
+      com.datadoghq.ad.logs: '[{"source": "java", "service": "grades-service"}]'
+  tuition:
+    environment:
+      - PROFILE=local
+      - ENROLLMENTS_SERVICE_URL=http://host.docker.internal:8081/grades
+      - TUITION_SERVICE_URL=http://host.docker.internal:8082/tuition
+      - DD_PROFILING_ENABLED=true
+      - DD_AGENT_HOST=datadog
+    image: 'docker.io/ezerbo/tuition-service'
+    ports:
+      - '8082:8082'
+    depends_on:
+      - datadog
+    labels:
+      com.datadoghq.tags.env: 'local'
+      com.datadoghq.tags.service: 'tuition-service'
+      com.datadoghq.tags.version: '1.0'
+      com.datadoghq.ad.logs: '[{"source": "java", "service": "tuition-service"}]'

@@ -5,6 +5,7 @@
 export DD_AGENT_HOST
 
 java -javaagent:./dd-java-agent.jar \
+ -XX:FlightRecorderOptions=stackdepth=256 \
  -Ddd.env="$ENV" \
  -Ddd.service=enrollments-service \
  -Ddd.version="$VERSION" \

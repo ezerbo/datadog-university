@@ -36,6 +36,10 @@
         {
           "name": "PROFILE",
           "value": "demo"
+        },
+        {
+          "name": "DD_PROFILING_ENABLED",
+          "value": "true"
         }
       ]
     }
