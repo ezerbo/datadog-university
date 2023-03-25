@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DD_AGENT_HOST=$(cat $ECS_CONTAINER_METADATA_FILE | grep "HostPrivateIPv4Address" | awk '{print $2}' | tr -d '"')
+: "${DD_AGENT_HOST:=$(cat "$ECS_CONTAINER_METADATA_FILE" | grep "HostPrivateIPv4Address" | awk '{print $2}' | tr -d '"')}"
 
 export DD_AGENT_HOST
 
