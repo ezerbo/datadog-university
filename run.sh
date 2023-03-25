@@ -1,10 +1,10 @@
 #!/bin/sh
 
-: "${DD_AGENT_HOST:=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)}"
+DD_AGENT_HOST=$(cat $ECS_CONTAINER_METADATA_FILE | grep "HostPrivateIPv4Address" | awk '{print $2}' | tr -d '"')
 
 export DD_AGENT_HOST
 
-java -javaagent:./dd-java-agent.jar \
+exec java -javaagent:./dd-java-agent.jar \
  -XX:FlightRecorderOptions=stackdepth=256 \
  -Ddd.env="$ENV" \
  -Ddd.service=enrollments-service \

@@ -8,23 +8,25 @@ import io.swagger.v3.oas.models.info.Info;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class ContextConfig  {
+public class ContextConfig  implements WebMvcConfigurer {
 
-    private final ServiceProperties properties;
+    private final InstrumentationConfig instmConfig;
 
     public ContextConfig(ServiceProperties properties) {
-        this.properties = properties;
+        this.instmConfig = properties.getInstrumentationConfig();
     }
 
     @Bean
     public StatsDClient statsDClient() {
-        InstrumentationConfig config = properties.getInstrumentationConfig();
         return new NonBlockingStatsDClientBuilder()
-                .prefix(config.getStatsDClientPrefix())
-                .hostname(config.getAgentHost())
-                .port(config.getAgentPort())
+                .prefix(instmConfig.getStatsDClientPrefix())
+                .hostname(instmConfig.getAgentHost())
+                .port(instmConfig.getAgentPort())
                 .build();
     }
 
@@ -49,6 +51,11 @@ public class ContextConfig  {
                 .title("Enrollments Service");
         return new OpenAPI()
                 .info(info);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**");
     }
 
 }

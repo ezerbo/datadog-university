@@ -21,9 +21,9 @@ spring:
 
 app:
   instrumentation-config:
-     stats-d-client-prefix: statsd
-     agent-host: localhost
-     agent-port: 8125
+    stats-d-client-prefix: statsd
+    agent-host: localhost
+    agent-port: 8125
   grades-service-config:
     url: http://localhost:8081/grades
   tuition-service-config:

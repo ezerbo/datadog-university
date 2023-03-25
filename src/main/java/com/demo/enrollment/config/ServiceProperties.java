@@ -2,6 +2,7 @@ package com.demo.enrollment.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
 @Data
 @ConfigurationProperties(prefix = "app")
 public class ServiceProperties {
@@ -11,4 +12,5 @@ public class ServiceProperties {
     private ExternalServiceConfig gradesServiceConfig = new ExternalServiceConfig();
 
     private ExternalServiceConfig tuitionServiceConfig = new ExternalServiceConfig();
+
 }
