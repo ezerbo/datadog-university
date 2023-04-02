@@ -1,11 +1,14 @@
 package com.demo.enrollment.service.client;
 
 import com.demo.enrollment.config.ServiceProperties;
+import com.demo.enrollment.error.ApiErrorResponseHandler;
 import com.demo.enrollment.model.Enrollment;
+import com.demo.enrollment.model.EnrollmentId;
 import com.demo.enrollment.model.api.CreateGradeRequest;
 import com.demo.enrollment.model.api.Grade;
 import com.demo.enrollment.model.api.UpdateGradeRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -16,11 +19,11 @@ import org.springframework.web.client.RestTemplate;
 public class GradesApiClient {
 
     private final String gradesApiUrl;
-    private final RestTemplate client = new RestTemplate();
+    private final RestTemplate client;
 
-    public GradesApiClient(ServiceProperties properties) {
-        this.gradesApiUrl = properties.getGradesServiceConfig()
-                .getUrl();
+    public GradesApiClient(ServiceProperties properties, RestTemplateBuilder restTemplateBuilder) {
+        this.gradesApiUrl = properties.getGradesServiceConfig().getUrl();
+        this.client = restTemplateBuilder.errorHandler(new ApiErrorResponseHandler()).build();
     }
 
     public Grade get(Enrollment enrollment) {
@@ -44,4 +47,7 @@ public class GradesApiClient {
                 .getBody();
     }
 
+    public void delete(Long gradeId) {
+        client.delete(gradesApiUrl.concat("/{id}"), gradeId);
+    }
 }

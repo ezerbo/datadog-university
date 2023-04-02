@@ -3,15 +3,21 @@ package com.demo.enrollment.service;
 import com.demo.enrollment.error.DuplicateRecordException;
 import com.demo.enrollment.error.NoDataFoundException;
 import com.demo.enrollment.model.Enrollment;
+import com.demo.enrollment.model.EnrollmentId;
 import com.demo.enrollment.model.Student;
 import com.demo.enrollment.model.api.*;
+import com.demo.enrollment.repository.CourseRepository;
+import com.demo.enrollment.repository.EnrollmentRepository;
 import com.demo.enrollment.repository.StudentRepository;
+import com.demo.enrollment.service.client.GradesApiClient;
 import com.demo.enrollment.service.client.TuitionApiClient;
 import datadog.trace.api.Trace;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,11 +26,22 @@ import java.util.stream.Collectors;
 public class StudentService {
 
     private final StudentRepository repository;
-    private final TuitionApiClient tuitionApiClient;
+    private final EnrollmentRepository enrollmentRepository;
+    private final CourseRepository courseRepository;
 
-    public StudentService(StudentRepository repository, TuitionApiClient tuitionApiClient) {
+    private final TuitionApiClient tuitionApiClient;
+    private final GradesApiClient gradesApiClient;
+
+    public StudentService(StudentRepository repository,
+                          EnrollmentRepository enrollmentRepository,
+                          CourseRepository courseRepository,
+                          TuitionApiClient tuitionApiClient,
+                          GradesApiClient gradesApiClient) {
         this.repository = repository;
+        this.enrollmentRepository = enrollmentRepository;
+        this.courseRepository = courseRepository;
         this.tuitionApiClient = tuitionApiClient;
+        this.gradesApiClient = gradesApiClient;
     }
 
     @Trace(operationName = "student.create")
@@ -48,6 +65,7 @@ public class StudentService {
         return repository.save(student);
     }
 
+    @Transactional
     @Trace(operationName = "student.update")
     public Student update(Long id, UpdateStudentRequest request) {
         log.info("Updating a student, request: {}, id: {}", request, id);
@@ -69,7 +87,16 @@ public class StudentService {
                 .ssn(request.getSsn())
                 .dob(request.getDob())
                 .enrollments(studentOp.get().getEnrollments())
+                .tuitionId(studentOp.get().getTuitionId())
                 .build();
+        Tuition tuition = tuitionApiClient.get(student.getTuitionId());
+        if (!Objects.equals(tuition.getAmount(), request.getTuitionAmount()) || tuition.isPaid() != request.isPaid()) {
+            tuitionApiClient.update(tuition.getId(), SetTuitionRequest.builder()
+                            .amount(request.getTuitionAmount())
+                            .studentId(id)
+                            .paid(request.isPaid())
+                    .build());
+        }
         return repository.save(student);
     }
 
@@ -103,6 +130,28 @@ public class StudentService {
                         .enrollments(toEnrollments(student.getEnrollments()))
                         .build())
                 .orElseThrow(() -> new NoDataFoundException("No student found with id %s", id));
+    }
+
+    @Transactional
+    public void deleteEnrollment(Long studentId, Long courseId) {
+        log.info("Deleting enrollments for student with id: {} and courseId: {}", studentId, courseId);
+        if (!repository.existsById(studentId)) {
+            log.error("No student found with id: {}", studentId);
+            throw new NoDataFoundException("No student found with id: %s", studentId);
+        }
+
+        if (!courseRepository.existsById(courseId)) {
+            log.error("No course found with id: {}", courseId);
+            throw new NoDataFoundException("No course found with id: %s", courseId);
+        }
+
+        EnrollmentId id = EnrollmentId.builder()
+                .studentId(studentId)
+                .courseId(courseId)
+                .build();
+        Enrollment enrollment = enrollmentRepository.findById(id).get();
+        enrollmentRepository.delete(enrollment);
+        gradesApiClient.delete(enrollment.getGradeId());
     }
 
     public Tuition getTuitionDetails(Long id) {

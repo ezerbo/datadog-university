@@ -54,6 +54,12 @@ public class StudentResource {
         return ResponseEntity.ok(service.getEnrollments(id));
     }
 
+    @DeleteMapping(ServicePaths.STUDENT_ENROLLMENTS)
+    public ResponseEntity<Void> unenroll(@PathVariable Long id, @RequestParam Long courseId) {
+        service.deleteEnrollment(id, courseId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping(ServicePaths.TUITION)
     public ResponseEntity<Tuition> getTuitionDetails(@PathVariable Long id) {
         return ResponseEntity.ok(service.getTuitionDetails(id));

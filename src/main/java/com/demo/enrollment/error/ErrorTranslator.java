@@ -24,6 +24,14 @@ public class ErrorTranslator {
 		return toErrorVM(ex);
 	}
 
+	@ResponseStatus(HttpStatus.FAILED_DEPENDENCY)
+	@ExceptionHandler(ApiCallFailureException.class)
+	public ErrorVM translate(ApiCallFailureException ex) {
+		log.error("Api Call Failure {}", ex.getMessage());
+		ex.printStackTrace();
+		return toErrorVM(ex);
+	}
+
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler({DuplicateRecordException.class, InvalidCourseDatesException.class})
 	public ErrorVM translateInvalidDateExceptions(Exception ex) {

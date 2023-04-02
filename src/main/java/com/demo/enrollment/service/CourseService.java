@@ -82,9 +82,17 @@ public class CourseService {
         return repository.save(course);
     }
 
-    public List<Course> getAll() {
+    public List<Course> getAll(Long studentId) {
+        List<Course> courses = repository.findAll();
+        if (studentId != null) {
+            log.info("Getting courses for enrollment, studentId: {}", studentId);
+            return courses.stream()
+                    .filter(course -> course.getEnrollments().stream()
+                            .noneMatch(enrollment -> enrollment.getStudent().getId().equals(studentId)))
+                    .collect(Collectors.toList());
+        }
         log.info("Getting all courses");
-        return repository.findAll();
+        return courses;
     }
 
     public Optional<Course> getOne(Long id) {

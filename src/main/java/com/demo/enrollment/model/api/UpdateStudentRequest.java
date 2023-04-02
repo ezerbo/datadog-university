@@ -34,4 +34,10 @@ public class UpdateStudentRequest {
     @Length(min = 9, max = 9, message = "Lastname should be between {max} characters long")
     @NotBlank(message = "The ssn is required")
     private String ssn;
+
+    @NotNull
+    @Positive(message = "Must be a positive value")
+    private Double tuitionAmount;
+
+    private boolean paid;
 }

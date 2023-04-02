@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -34,8 +35,9 @@ public class CourseResource {
     }
 
     @GetMapping(ServicePaths.COURSES)
-    public ResponseEntity<List<Course>> getAll() {
-        return ResponseEntity.ok(service.getAll());
+    public ResponseEntity<List<Course>> getAll(
+            @RequestParam(required = false, name = "enrollingStudentId") Long studentId) {
+        return ResponseEntity.ok(service.getAll(studentId));
     }
 
     @GetMapping(ServicePaths.COURSE_BY_ID)
