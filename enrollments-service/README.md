@@ -56,7 +56,7 @@ COPY run.sh run.sh
 ENTRYPOINT ["sh", "run.sh"]
 ```
 The script used to launch the application references the Datadog Java tracer for instrumentation.
-The tracer submits traces to the agent on port 8126 and metrics and logs on port 8125 (see the [ECS task definition](enrollments-service/ecs-task-definitions/datadog-agent-ecs.json) for more details).
+The tracer submits traces to the agent on port 8126 and metrics and logs on port 8125 (see the [ECS task definition](../ecs-task-definitions/datadog-agent-ecs.json) for more details).
 
 When running locally, a docker network is created to allow the app container to communicate with the agent's.
 On ECS, however, the environment variable 'DD_AGENT_HOST' is used in the application container to allow the tracer to know where to submit telemetry data.
@@ -104,7 +104,7 @@ To build the jar file and a new image, use the '-b' flag and set it to 'true'
 When the application successfully starts, the swagger documentation can be accessed from [here](http://localhost:8080/swagger-ui/index.html)
 
 ## ECS Task Definitions
-Two task definitions are available here: [the agent's](enrollments-service/ecs-task-definitions/datadog-agent-ecs.json) and [the application's](enrollments-service/ecs-task-definitions/enrollments-service-ecs.json). 
+Two task definitions are available here: [the agent's](../ecs-task-definitions/datadog-agent-ecs.json) and [the application's](../ecs-task-definitions/enrollments-service-ecs.json). 
 A few features of the agent are turned on including APM, Log Collection, Networking, etc.
 
 The DD_API_KEY environment variable is set through AWS Secrets Manager. Secrets are retrieved by specifying the execution role's and the secrets' ARNs.
@@ -120,7 +120,7 @@ The DD_API_KEY environment variable is set through AWS Secrets Manager. Secrets 
 ]
 ```
 The following scripts, although incomplete, can be used to update task definitions in ECS. (Make sure you are already logged in) 
-[App's task definition](enrollments-service/ecs-task-definitions/update-es-etd.sh), [Agent's](enrollments-service/ecs-task-definitions/update-dd-agent-etd.sh)
+[App's task definition](../ecs-task-definitions/update-es-etd.sh), [Agent's](../ecs-task-definitions/update-dd-agent-etd.sh)
 
 ## Running on ECS
 

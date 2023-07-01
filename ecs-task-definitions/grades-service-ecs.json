@@ -1,0 +1,48 @@
+{
+  "executionRoleArn": "arn:aws:iam::637020351615:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "grades-service",
+      "image": "docker.io/ezerbo/grades-service",
+      "cpu": 100,
+      "memory": 512,
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/grades-service",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 8081,
+          "protocol": "tcp",
+          "containerPort": 8081
+        }
+      ],
+      "secrets": [
+        {
+          "name": "ENROLLMENTS_SERVICE_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:637020351615:parameter/ENROLLMENTS_SERVICE_URL"
+        },
+        {
+          "name": "TUITION_SERVICE_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:637020351615:parameter/TUITION_SERVICE_URL"
+        }
+      ],
+      "environment": [
+        {
+          "name": "PROFILE",
+          "value": "demo"
+        },
+        {
+          "name": "DD_PROFILING_ENABLED",
+          "value": "true"
+        }
+      ]
+    }
+  ],
+  "family": "grades-service"
+}

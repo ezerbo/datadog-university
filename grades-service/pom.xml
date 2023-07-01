@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.datadog.demo</groupId>
+		<artifactId>datadog-university</artifactId>
+		<version>1.0</version>
+	</parent>
+
+	<artifactId>grades-service</artifactId>
+	<version>1.0</version>
+	<name>grades-service</name>
+	<description>Service to Return Grades</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<logback-encoder.version>7.3</logback-encoder.version>
+		<dd-trace-api.version>1.9.0</dd-trace-api.version>
+		<springdoc-openapi-ui.version>1.6.14</springdoc-openapi-ui.version>
+	</properties>
+	<build>
+		<finalName>grades-service</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

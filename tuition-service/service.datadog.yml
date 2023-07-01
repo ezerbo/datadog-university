@@ -1,0 +1,43 @@
+---
+schema-version: v2
+team: University SREs
+dd-service: tuition-service
+contacts:
+  - type: email
+    name: Edouard Zerbo
+    contact: zerboedouard@gmail.com
+docs:
+  - name: Readme File
+    provider: link
+    url: https://github.com/ezerbo/tuition-service#readme
+repos:
+  - provider: github
+    name: Tuition Service
+    url: https://github.com/ezerbo/tuition-service
+links:
+  - name: Courses & Enrollments
+    type: dashboard
+    url: https://app.datadoghq.com/dashboard/7q2-634-hpc/courses-enrollments
+  - name: Operations
+    type: runbook
+    url: https://app.datadoghq.com/notebook/4930856/courses-enrollments-operations
+
+---
+schema-version: v2
+team: University SREs
+dd-service: tuition_db
+contacts:
+  - type: email
+    name: Edouard Zerbo
+    contact: zerboedouard@gmail.com
+docs:
+  - name: Readme File
+    provider: link
+    url: https://github.com/ezerbo/tuition-service#readme
+links:
+  - name: Courses & Enrollments
+    type: dashboard
+    url: https://app.datadoghq.com/dashboard/7q2-634-hpc/courses-enrollments
+  - name: Operations
+    type: runbook
+    url: https://app.datadoghq.com/notebook/4930856/courses-enrollments-operations

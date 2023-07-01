@@ -3,7 +3,7 @@ services:
   datadog:
     image: 'datadog/agent:latest'
     environment:
-      - DD_API_KEY
+      - DD_API_KEY #should be defined prior to running the services
       - DD_HOSTNAME=datadog-agent
       - DD_LOGS_ENABLED=true
       - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true

@@ -5,14 +5,15 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.9</version>
+        <version>2.7.13</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.intellibus.demo</groupId>
-    <artifactId>enrollments-service</artifactId>
+    <groupId>com.datadog.demo</groupId>
+    <artifactId>datadog-university</artifactId>
     <version>1.0</version>
-    <name>enrollments-service</name>
-    <description>Service allowing the enrollment of students into courses (Datadog APM Demo)</description>
+    <name>datadog-university</name>
+    <description>Datadog Features Demo Apps</description>
+    <packaging>pom</packaging>
 
     <properties>
         <java.version>8</java.version>
@@ -20,6 +21,12 @@
         <dd-trace-api.version>1.9.0</dd-trace-api.version>
         <springdoc-openapi-ui.version>1.6.14</springdoc-openapi-ui.version>
     </properties>
+
+    <modules>
+        <module>enrollments-service</module>
+        <module>grades-service</module>
+        <module>tuition-service</module>
+    </modules>
 
     <dependencies>
         <!-- Spring -->
@@ -93,23 +100,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <finalName>enrollments-service</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

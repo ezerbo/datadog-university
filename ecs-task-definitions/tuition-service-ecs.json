@@ -1,0 +1,37 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "tuition-service",
+      "image": "docker.io/ezerbo/tuition-service",
+      "cpu": 100,
+      "memory": 512,
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/tuition-service",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 8082,
+          "protocol": "tcp",
+          "containerPort": 8082
+        }
+      ],
+      "environment": [
+        {
+          "name": "PROFILE",
+          "value": "demo"
+        },
+        {
+          "name": "DD_PROFILING_ENABLED",
+          "value": "true"
+        }
+      ]
+    }
+  ],
+  "family": "tuition-service"
+}
