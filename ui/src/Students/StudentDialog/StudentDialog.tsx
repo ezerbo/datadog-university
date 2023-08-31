@@ -77,7 +77,7 @@ export class StudentDialog extends Component<DialogProps, DialogState> {
         };
         const { errorMessage, tuition, processing, gettingTuition } = this.state;
         const { student } = this.props;
-        const title = student ? 'Edit Student' : 'Add Student';
+        const title = student ? 'Edit Student' : 'Register a Student';
         const subText = student ? 'Edit a student\'s info' : 'Add a new student';
         return (
             <Dialog
@@ -93,7 +93,7 @@ export class StudentDialog extends Component<DialogProps, DialogState> {
                     titleAriaId: 'myLabelId',
                     subtitleAriaId: 'mySubTextId',
                     isBlocking: true,
-                    containerClassName: 'ms-dialogMainOverride'
+                    containerClassName: 'ms-dialogMainOverride',
                 }}
                 minWidth={600}
             >
@@ -275,7 +275,7 @@ export class StudentDialog extends Component<DialogProps, DialogState> {
             headers: { "Content-Type": "application/json" },
             data: JSON.stringify(student)
         })
-            .then(handleHttpErrors)
+           // .then(handleHttpErrors)
             .then(res => res.data)
             .then(student => {
                 this.setProcessingStatus(false);

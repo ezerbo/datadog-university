@@ -203,7 +203,7 @@ export class EnrollmentsDialog extends React.Component<EnrollmentsProps, Enrollm
                             onConfirmation={this.unenroll}
                             width={500}
                             confirmationIconName='RemoveFromShoppingList'
-                            style={{marginRight: '8px'}}
+                            confirmationBtnStyle={{marginRight: '8px'}}
                         />
                     )
                 }

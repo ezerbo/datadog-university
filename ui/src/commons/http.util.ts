@@ -15,6 +15,10 @@ export const handleErrors = (response: AxiosResponse) => {
     return response;
 }
 
+export const formatErrors = (error: any) => {
+    return error.response.data.fieldErrors.map(fieldError => `${fieldError.field}: ${fieldError.message}.`);
+}
+
 export const toDate = (date: any) => {
     return new Date(date).toLocaleString(undefined,
         {

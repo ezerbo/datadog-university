@@ -15,13 +15,13 @@ export interface ConfirmationProps {
     onDismiss: () => void;
     width: number;
     confirmationIconName: string;
-    style: CSSProperties;
+    confirmationBtnStyle: CSSProperties;
 }
 
 export class Confirmation extends React.Component<ConfirmationProps, {}> {
 
     public render(): React.ReactElement<ConfirmationProps> {
-        const {width, confirmationBtnTxt, confirmationIconName, style} = this.props;
+        const {width, confirmationBtnTxt, confirmationIconName, confirmationBtnStyle} = this.props;
         return (
             <Dialog
                 hidden={false}
@@ -39,7 +39,7 @@ export class Confirmation extends React.Component<ConfirmationProps, {}> {
                 minWidth={width}
             >
                 <div>
-                    <Text variant={'large'}>
+                    <Text variant={'mediumPlus'}>
                         {this.props.question}
                     </Text>
                 </div>
@@ -49,7 +49,7 @@ export class Confirmation extends React.Component<ConfirmationProps, {}> {
                         onClick={this.props.onConfirmation}
                         text={confirmationBtnTxt}
                         iconProps={{ iconName: confirmationIconName }}
-                        style={style}
+                        style={confirmationBtnStyle}
                     />
                     <PrimaryButton
                         onClick={this.props.onDismiss}

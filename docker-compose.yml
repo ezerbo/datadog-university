@@ -43,6 +43,9 @@ services:
       - '8080:8080'
     depends_on:
       - datadog
+    build:
+      context: ./enrollments-service
+      dockerfile: Dockerfile
     labels:
       com.datadoghq.tags.env: 'local'
       com.datadoghq.tags.service: 'enrollments-service'
@@ -61,6 +64,9 @@ services:
       - '8081:8081'
     depends_on:
       - datadog
+    build:
+      context: ./grades-service
+      dockerfile: Dockerfile
     labels:
       com.datadoghq.tags.env: 'local'
       com.datadoghq.tags.service: 'grades-service'
@@ -78,8 +84,22 @@ services:
       - '8082:8082'
     depends_on:
       - datadog
+    build:
+      context: ./tuition-service
+      dockerfile: Dockerfile
     labels:
       com.datadoghq.tags.env: 'local'
       com.datadoghq.tags.service: 'tuition-service'
       com.datadoghq.tags.version: '1.0'
       com.datadoghq.ad.logs: '[{"source": "java", "service": "tuition-service"}]'
+  enrollments-ui:
+    image: 'docker.io/ezerbo/enrollments-ui'
+    ports:
+      - '3000:3000'
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    depends_on:
+      - enrollments
+      - grades
+      - tuition

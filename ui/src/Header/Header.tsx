@@ -1,15 +1,27 @@
 import * as React from 'react';
-import {initializeIcons} from '@fluentui/react';
+import {Icon, initializeIcons, mergeStyles, Separator, Text} from '@fluentui/react';
+import {ddColor} from "../commons/styles.util";
+
+const iconClass = mergeStyles({
+    fontSize: 150,
+    height: 150,
+    width: 150,
+    color: ddColor
+});
 
 initializeIcons();
 
-export class Header extends React.Component {
+export const Header = () => {
 
-   render() {
-       return (
-          <div>
-              Datadog University. Learn about Observability using Infrastructure Monitoring, APM, NPM, Synthetic Monitoring, etc
-          </div>
-       );
-   }
+    return (
+        <div style={{margin: 10, textAlign: "center"}}>
+            <Icon iconName={'Education'} className={iconClass}/>
+            <div>
+                <Text style={{color: ddColor}}>
+                    DATADOG UNIVERSITY
+                </Text>
+            </div>
+            <Separator vertical/>
+        </div>
+    );
 }

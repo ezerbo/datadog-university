@@ -1,9 +1,2 @@
-import {IIconStyles} from "@fluentui/react";
-
-export const separatorIconStyles: IIconStyles = {
-    root: {
-        fontSize: '48px',
-        height: '48px',
-        width: '48px',
-    },
-};
+export const ddColor = '#6126a7';
+export const dangerColor = '#a80000';
