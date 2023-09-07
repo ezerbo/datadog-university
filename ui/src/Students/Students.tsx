@@ -11,7 +11,9 @@ import {Message} from "../commons/Message/Message";
 import {Confirmation} from "../commons/Confirmation/Confirmation";
 import {dangerColor, ddColor} from "../commons/styles.util";
 import {useNavigate} from "react-router-dom";
-
+import {Header} from "../Header/Header";
+import {Footer} from "../Footer/Footer";
+import {NavigationBar} from "../commons/NavigationBar/NavigationBar";
 import {
     ActionButton,
     DetailsListLayoutMode,
@@ -24,9 +26,6 @@ import {
     Spinner,
     TooltipHost
 } from "@fluentui/react";
-import {Header} from "../Header/Header";
-import {Footer} from "../Footer/Footer";
-import {NavigationBar} from "../commons/NavigationBar/NavigationBar";
 
 const hostStyles: Partial<ITooltipHostStyles> = {root: {display: 'inline-block'}};
 const calloutProps = {gapSpace: 0};
@@ -47,18 +46,6 @@ export const Students = (props) => {
         showConfirmationDialog: false,
         enrollments: null
     });
-    // const [students, setStudents] = useState([]);
-    const [showDialog, setShowDialog] = useState(false);
-    const [gettingStudents, setGettingStudents] = useState(false);
-    const [showEnrollmentsDialog, setShowEnrollmentsDialog] = useState(false);
-    //  const [selected, setSelected] = useState(null);
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState(null);
-    const [processing, setProcessing] = useState(false);
-    const [processingMessage, setProcessingMessage] = useState(null);
-    const [editing, setEditing] = useState(false);
-    const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
-    const [enrollments, setEnrollments] = useState(null);
 
     const navigate = useNavigate();
 
@@ -66,8 +53,7 @@ export const Students = (props) => {
     const selection: Selection = new Selection({
         onSelectionChanged: () => {
             let selections = selection.getSelection();
-            let selected = selections.length ? selections[0] as Student : null;
-            setStudentState(studentState => ({...studentState, ...{selected: selected}}))
+            setState({selected: selections.length ? selections[0] as Student : null});
         }
     });
 
@@ -79,7 +65,7 @@ export const Students = (props) => {
     }, []);
 
     const getAll = () => {
-        setGettingStudents(true);
+        setState({gettingStudents: true});
         axios({
             url: `${ENROLLMENTS_API_URL}/students`,
             method: 'GET',
@@ -87,17 +73,16 @@ export const Students = (props) => {
         })
             .then(res => handleErrors(res))
             .then(res => {
-                setStudentState(studentState => ({...studentState, ...{students: res.data}}));
-                setGettingStudents(false);
+                setState({students: res.data, gettingStudents: false});
                 props.onCountChange(res.data.length)
             }).catch(error => {
             console.log(JSON.stringify(error));
-            setGettingStudents(false);
+            setState({gettingStudents: false});
         });
     }
 
     const getEnrollments = (studentId: number) => {
-        setEnrollments(undefined);
+        setState({enrollments: undefined});
         axios({
             url: `${ENROLLMENTS_API_URL}/students/${studentId}/enrollments`,
             method: 'GET',
@@ -105,94 +90,89 @@ export const Students = (props) => {
         })
             .then(res => handleErrors(res))
             .then(res => {
-                setEnrollments(res.data.enrollments);
+                setState({enrollments: res.data.enrollments});
             }).catch(error => {
             console.log(JSON.stringify(error));
         });
     }
 
     const dismissDialog = () => {
-        setShowDialog(false);
+        setState({showDialog: false})
     }
 
     const toggleConfirmationDialog = () => {
-        setShowConfirmationDialog(!showConfirmationDialog);
+        setState({showConfirmationDialog: !studentState.showConfirmationDialog});
     }
 
     const toggleEnrollmentsDialog = () => {
-        if (!showEnrollmentsDialog) { // State is changing from 'hidden' to 'shown'
+        if (!studentState.showEnrollmentsDialog) { // State is changing from 'hidden' to 'shown'
             getEnrollments(studentState.selected.id);
         }
-        setShowEnrollmentsDialog(!showConfirmationDialog);
+        setState({showEnrollmentsDialog: !studentState.showEnrollmentsDialog})
     }
 
     const deleteStudent = () => {
         toggleConfirmationDialog();
-        setProcessing(true);
-        setProcessingMessage('Removing a student...')
+        setStudentState(studentState => ({...studentState,
+            ...{processing: true, processingMessage: 'Removing a student...'}}));
         axios({
             url: `${ENROLLMENTS_API_URL}/students/${studentState.selected.id}`,
             method: 'DELETE'
         })
             .then(() => {
                 selection.setAllSelected(false);
-                setProcessing(false);
-                setMessage('Student successfully removed');
-                setMessageType(MessageBarType.success);
-                setStudentState(studentState => ({
-                    ...studentState, ...{
-                        selected: null,
-                        students: studentState.students.filter(student => student.id !== studentState.selected.id)
-                    }
-                }));
+                setState({
+                    processing: false,
+                    selected: null,
+                    message: 'Student successfully removed',
+                    messageType: MessageBarType.success,
+                    students: studentState.students.filter(student => student.id !== studentState.selected.id)
+                });
                 resetMessage();
             })
             .catch(error => {
                 console.log(JSON.stringify(error));
-                setProcessing(false);
-                setMessage('Student successfully removed');
-                setMessageType(MessageBarType.error);
+                setState({
+                    processing: false,
+                    message: 'Student could not be removed',
+                    messageType: MessageBarType.error
+                })
                 resetMessage();
             });
     }
 
     const onEnroll = (e: Enrollment) => {
-        enrollments.push(e);
-        setEnrollments(enrollments);
+        studentState.enrollments.push(e);
+        setState({enrollments: studentState.enrollments});
         resetMessage();
     }
 
     const onUnenroll = (enrollment: Enrollment) => {
-        setEnrollments(enrollments.filter(e => e.gradeId !== enrollment.gradeId).slice());
+        setState({enrollments: studentState.enrollments.filter(e => e.gradeId !== enrollment.gradeId)
+                .slice()});
         resetMessage();
     }
 
     const onCreate = (student: Student) => {
         studentState.students.push(student);
         props.onCountChange(studentState.students.length);
-        setStudentState(studentState => ({
-            ...studentState, ...{
-                students: studentState.students.slice(),
-                message: 'Student Created Successfully'
-            }
-        }));
+        setState({students: studentState.students.slice(), message: 'Student Created Successfully'});
         resetMessage();
     }
 
     const onEdit = (student: Student) => {
         let index = studentState.students.findIndex(c => c.id === student.id);
         studentState.students[index] = student;
-        setStudentState(studentState => ({
-            ...studentState, ...{
-                students: studentState.students.slice(),
-                message: 'Student Updated Successfully'
-            }
-        }));
+        setState({ students: studentState.students.slice(), message: 'Student Updated Successfully'});
         resetMessage();
     }
 
     const resetMessage = () => {
-        timeoutID = setTimeout(() => setMessage(null), 5000);
+        timeoutID = setTimeout(() => setState({message: null}), 5000);
+    }
+
+    const setState = (state: any) => {
+        setStudentState(studentState => ({...studentState, ...state}));
     }
 
     return (
@@ -201,18 +181,18 @@ export const Students = (props) => {
             <NavigationBar />
             <div style={{paddingLeft: 10}}>
                 {
-                    message && (
+                    studentState.message && (
                         <div style={{padding: 5}}>
                             <Message
-                                message={message}
-                                type={messageType}
+                                message={studentState.message}
+                                type={studentState.messageType}
                             />
                         </div>
                     )
                 }
                 {
-                    processing && (
-                        <Spinner label={processingMessage} labelPosition="bottom"/>
+                    studentState.processing && (
+                        <Spinner label={studentState.processingMessage} labelPosition="bottom"/>
                     )
                 }
 
@@ -246,7 +226,7 @@ export const Students = (props) => {
                 <div style={{clear: "both"}}>
                     <ShimmeredDetailsList
                         items={studentState.students || []}
-                        enableShimmer={gettingStudents}
+                        enableShimmer={studentState.gettingStudents}
                         columns={columns}
                         selectionMode={SelectionMode.single}
                         setKey="students"
@@ -256,14 +236,14 @@ export const Students = (props) => {
                     />
                 </div>
                 <StudentDialog
-                    show={showDialog}
-                    student={editing ? studentState.selected : undefined}
+                    show={studentState.showDialog}
+                    student={studentState.editing ? studentState.selected : undefined}
                     onCreateSuccess={onCreate}
                     onEditSuccess={onEdit}
                     onDismiss={dismissDialog}
                 />
                 {
-                    showConfirmationDialog && (
+                    studentState.showConfirmationDialog && (
                         <Confirmation
                             question={'Are you sure you want to remove this student?'}
                             confirmationBtnTxt={'Remove'}
@@ -280,8 +260,8 @@ export const Students = (props) => {
                         <div>
                             <EnrollmentsDialog
                                 student={studentState.selected}
-                                enrollments={enrollments}
-                                show={showEnrollmentsDialog}
+                                enrollments={studentState.enrollments}
+                                show={studentState.showEnrollmentsDialog}
                                 onDismiss={toggleEnrollmentsDialog}
                                 onEnroll={onEnroll}
                                 onUnenroll={onUnenroll}
@@ -342,6 +322,6 @@ const columns: IColumn[] = [
         styles: {root: {color: ddColor}},
         onRender: (student: Student) => {
             return <span>{toDate(student.dob)}</span>;
-        },
+        }
     }
 ];

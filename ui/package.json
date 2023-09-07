@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@datadog/browser-rum": "^4.44.0",
+    "@fluentui/example-data": "^8.4.12",
     "@fluentui/react": "^8.105.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^12.1.5",
